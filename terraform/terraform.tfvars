@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gcp_project_id = "<project_id_here>"
+gcp_project_id = "poised-sunrise-429308-m3"
 
-memorystore = false
+memorystore = false 

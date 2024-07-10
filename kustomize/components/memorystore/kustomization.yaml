@@ -28,7 +28,7 @@ patches:
             - name: server
               env:
               - name: REDIS_ADDR
-                value: "REDIS_CONNECTION_STRING"
+                value: "10.93.198.179:6379"
 # redis - remove the redis-cart Deployment
 - patch: |-
     apiVersion: apps/v1
