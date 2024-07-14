@@ -19,6 +19,11 @@ metadata:
   labels:
     app: checkoutservice
 spec:
+  replicas: 3 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 1
   selector:
     matchLabels:
       app: checkoutservice

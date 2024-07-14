@@ -55,12 +55,39 @@ resource "google_project_iam_binding" "k8s_engine_admin_binding" {
   members = ["serviceAccount:${google_service_account.github_actions_sa.email}"]
 }
 
+
 resource "google_project_iam_binding" "artifact_registry_admin_binding" {
   project = var.gcp_project_id
   role    = "roles/artifactregistry.admin"
   members = ["serviceAccount:${google_service_account.github_actions_sa.email}"]
 }
 
+
+resource "google_iam_workload_identity_pool" "pool" {
+  workload_identity_pool_id = "github"
+}
+
+resource "google_iam_workload_identity_pool_provider" "example" {
+  workload_identity_pool_id          = google_iam_workload_identity_pool.pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = "github"
+  attribute_mapping                  = {
+    "google.subject" = "assertion.sub"
+    "attribute.actor" = "assertion.actor"
+    "attribute.aud" = "assertion.aud"
+    "attribute.repository" = "assertion.repository"
+  }
+  attribute_condition  = "assertion.repository=='bjw123/GCP-take-home'"
+  oidc {
+    issuer_uri        = "https://token.actions.githubusercontent.com"
+  }
+}
+
+
+resource "google_project_iam_binding" "workload_identity_sa_binding" {
+  project = var.gcp_project_id
+  role    = "roles/iam.workloadIdentityUser"
+  members = ["serviceAccount:${google_service_account.github_actions_sa.email}"]
+}
 
 
 # Create GKE cluster
