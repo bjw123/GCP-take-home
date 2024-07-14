@@ -36,6 +36,33 @@ module "enable_google_apis" {
   activate_apis = concat(local.base_apis, var.memorystore ? local.memorystore_apis : [])
 }
 
+resource "google_artifact_registry_repository" "my_docker_repo" {
+  location = var.region  # Choose your desired location
+  description   = "example docker repository"
+  format = "DOCKER"
+  repository_id = "my-docker-repo"  # Customize your repository name
+}
+
+
+resource "google_service_account" "github_actions_sa" {
+  account_id   = "github-actions-sa"
+  display_name = "github-actions-sa"
+}
+
+resource "google_project_iam_binding" "k8s_engine_admin_binding" {
+  project = var.gcp_project_id
+  role    = "roles/container.admin"
+  members = ["serviceAccount:${google_service_account.github_actions_sa.email}"]
+}
+
+resource "google_project_iam_binding" "artifact_registry_admin_binding" {
+  project = var.gcp_project_id
+  role    = "roles/artifactregistry.admin"
+  members = ["serviceAccount:${google_service_account.github_actions_sa.email}"]
+}
+
+
+
 # Create GKE cluster
 resource "google_container_cluster" "my_cluster" {
 

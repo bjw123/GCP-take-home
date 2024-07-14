@@ -42,7 +42,8 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.10.0
+          ###image: #gcr.io/google-samples/microservices-demo/checkoutservice:v0.10.0
+          image: asia-northeast1-docker.pkg.dev/poised-sunrise-429308-m3/my-docker-repo/checkoutservice:v1
           ports:
           - containerPort: 5050
           readinessProbe:
