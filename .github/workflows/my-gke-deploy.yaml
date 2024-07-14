@@ -22,7 +22,7 @@ env:
   GKE_CLUSTER: online-boutique     
   ###GKE_ZONE:  asia-northeast1-a   
   DEPLOYMENT_NAME: checkoutservice 
-  REPOSITORY: my-registry # Artifact Registry docker repository
+  REPOSITORY: my-docker-repo # Artifact Registry docker repository
   IMAGE: checkoutservice
   DOCKER_FILE: src/checkoutservice/Dockerfile
 
