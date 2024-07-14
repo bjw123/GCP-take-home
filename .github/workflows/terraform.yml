@@ -1,0 +1,58 @@
+#just run plan as i deployed it locally, we could setup a terraform backend in cloud storage
+name: Terraform Plan 
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  PROJECT_ID: poised-sunrise-429308-m3 #${{ secrets.GKE_PROJECT }}
+  Project_Number: 644521381632
+  GAR_LOCATION: asia-northeast1 
+  GKE_CLUSTER: online-boutique 
+  GKE_ZONE: asia-northeast1  
+
+jobs:
+  setup-build-publish-deploy:
+    name: Terraform init, plan
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Configure Workload Identity Federation and generate an access token.
+    - id: 'auth'
+      name: 'Obtain access token by using workload identity federation'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'projects/644521381632/locations/global/workloadIdentityPools/github/providers/github'
+        service_account:  'github-actions-workflow@poised-sunrise-429308-m3.iam.gserviceaccount.com' 
+        project_id: 'poised-sunrise-429308-m3'
+
+    - uses: hashicorp/setup-terraform@v3
+
+    - name: "tf init"
+      run: |-
+        cd terraform/
+        terraform init 
+
+    - name: "tf-validate"
+      run: |-
+        cd terraform/
+        terraform validate     
+
+    - name: 'tf-plan'
+      run: |- 
+        cd terraform/
+        terraform plan -no-color
+
+    #- name: 'tf-apply'
+    #  run: |- 
+    #    cd terraform/
+    #    terraform apply --auto-approve --no-color
