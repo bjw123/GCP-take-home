@@ -9,7 +9,7 @@ On GCP create a CICD pipeline for a microservice application, make it scalable, 
 * consider this a production grade deployment 
 
 # Architectural Diagram
-![DIAGRAM](cicd-pipeline.drawio.png) 
+![DIAGRAM](images/cicd-pipeline.drawio.png) 
 
 # Design Decisions 
 ## Minimize Downtime 
@@ -28,7 +28,7 @@ For this take home assignment we will use microservices demo provided by GCP as 
 
 Kubernetes yaml files are already provided as well as necessary terraform files to create GKE and Redis deployments however we will need to add additional credentials for Google Artifact Repository, Workload Identity Manager & Service Account + Roles
 
-Since this repo has many different applications in it we will only focus on 1 application checkoutservice we will also need to tag the image and push it to our repo.
+Since this repo has many different applications in it we will only focus on 1 application checkoutservice for the CICD pipeline but we will deploy them all to access our application. We will also need to tag the image and push it to our repo.
 
 ## CICD pipeline 
 Utilizing Github Actions and adding workload identity federation we can connect to our GCP project and push images, deploy it to the cluster
@@ -127,6 +127,12 @@ you will need the following variables from your infra
   IMAGE: checkoutservice
   SERVICE_ACCOUNT: XXXXXX
 ```
+Terraform will automatically apply the microservices kubernetes files to your cluster so everything is good to go 
+![LENS Deployments in Cluster](images/lens-snapshot.png) 
+
+[LINK TO APPLICATION](http://34.146.143.170/)
+![landing page](images/landing-page.png)
+![checkout service](images/checkout-svc.png)
 
 ### Setup CICD (Github Actions)
 For CICD we setup two simple pipelines one to deploy infra via terraform and 1 to update the deployment for checkoutservice.
@@ -135,6 +141,10 @@ add project ID and Project Number to Github secrets as the information is somewh
 
 On push to master your Pipelines will run 
 
+![Deployment CICD pipeline](images/deployment-cicd.png)
+![Terraform CICD pipeline](images/terraform-cicd.png)
+
+
 ### Demo Rollout (Merge to main)
 [Github Action Runs](https://github.com/bjw123/GCP-take-home/actions)
 
@@ -142,18 +152,25 @@ On push to master your Pipelines will run
 
 [Successful Deployment Pipeline](https://github.com/bjw123/GCP-take-home/actions/runs/9939129878/job/27453068938)
 
+![deployment pipeline logs](images/deployment-logs-cicd.png)
+
 ```
 kubectl get deploy checkoutservice -o yaml | grep "image: asia-northeast"
         image: asia-northeast1-docker.pkg.dev/poised-sunrise-429308-m3/my-docker-repo/checkoutservice:46ea2494a17bcee09b68db721437ea5dcbc22aa7
 ```
+![image changed by CICD pipeline LENS](images/cicd-deploy.png)
 
 ### Demo Logging 
 [Pod warning logs](https://cloudlogging.app.goo.gl/KzhfH2ZBjCzLxiubA)
 
 Can examine the logs for audit info, as to who applied what change, errors in pods or on infra and setup logging alerts on them.
 
+![Pod Warning Logs](images/logs.png)
+
 
 ### Demo monitoring 
 [Namespace Observibility Dashboard](https://console.cloud.google.com/monitoring/dashboards/builder/a4e8b420-6d1c-4c1e-a314-3a106b32ea1f;duration=PT1H?project=poised-sunrise-429308-m3)
 
 Already many prebuilt dashboards to monitor cluster health, you could set up alerts e.g. uptime is lower than expected or 0, Rollout Stuck due to pending pods etc.
+
+![Monitoring Dashboard](images/monitoring.png)
